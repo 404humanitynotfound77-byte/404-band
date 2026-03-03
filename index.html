@@ -440,6 +440,90 @@
       z-index:200;
     }
     .toast.show{opacity:1}
+    /* === EP GATE (C + B) === */
+.video-preview{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,26,26,.25);
+  background: rgba(0,0,0,.55);
+  cursor:pointer;
+  box-shadow:
+    0 0 0 1px rgba(255,26,26,.08) inset,
+    0 16px 60px rgba(0,0,0,.65),
+    0 0 28px rgba(255,26,26,.20);
+  transition: .25s ease;
+}
+.video-preview:hover{
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgba(255,26,26,.15) inset,
+    0 20px 70px rgba(0,0,0,.75),
+    0 0 40px rgba(255,26,26,.35);
+}
+.video-preview::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(255,26,26,.08), transparent 35%),
+    radial-gradient(900px 220px at 50% 0%, rgba(255,26,26,.12), transparent 60%);
+  mix-blend-mode:screen;
+}
+
+.gate-img{
+  width:100%;
+  display:block;
+  filter: contrast(1.08) saturate(1.08);
+}
+
+.video-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,.35);
+  transition:.3s ease;
+}
+.video-preview:hover .video-overlay{
+  background: rgba(0,0,0,.20);
+}
+
+.play-btn{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background: rgba(255,0,0,.90);
+  box-shadow: 0 0 35px rgba(255,0,0,.70);
+  position:relative;
+  transform: translateZ(0);
+}
+.play-btn::before{
+  content:"";
+  position:absolute;
+  left:32px;
+  top:26px;
+  border-left:22px solid #fff;
+  border-top:14px solid transparent;
+  border-bottom:14px solid transparent;
+}
+
+/* ratio per iframe quando parte */
+.ratio-16x9{
+  position:relative;
+  width:100%;
+  padding-top:56.25%;
+  border-radius:18px;
+  overflow:hidden;
+}
+.ratio-16x9 iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
   </style>
 </head>
 
@@ -543,20 +627,17 @@
     </div>
 
     <div class="two">
-      <section class="card" id="video">
-        <div class="section-title">Video</div>
-        <div class="video-preview">
-          <div class="ratio-16x9">
-           <iframe
-              src="https://www.youtube-nocookie.com/embed/9zgX0BCEpCw?rel=0&modestbranding=1"
-              title="404 — Generazione (Full EP)"
-              frameborder="0"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowfullscreen>
-            </iframe>
+     <section class="card" id="video">
+          <div class="section-title">Video</div>
+        
+          <!-- EP Gate: mostra cover + play, al click caricherà l'iframe via JS -->
+          <div class="video-preview" id="epGate" role="button" tabindex="0" aria-label="Riproduci EP">
+            <img class="gate-img" src="assets/img/youtube.png" alt="404 — Generazione (Full EP)">
+            <div class="video-overlay" aria-hidden="true">
+              <div class="play-btn"></div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       <section class="card" id="live">
         <div class="section-title">Live</div>
@@ -680,7 +761,38 @@
     requestAnimationFrame(frame);
   })();
   </script>
+  <script>
+(() => {
+  const gate = document.getElementById("epGate");
+  if (!gate) return;
+
+  const id = "9zgX0BCEpCw"; // <-- ID del video
+
+  const openPlayer = () => {
+    gate.innerHTML = `
+      <div class="ratio-16x9">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&autoplay=1"
+          title="404 — Generazione (Full EP)"
+          frameborder="0"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    `;
+  };
+
+  gate.addEventListener("click", openPlayer, { once:true });
+  gate.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openPlayer();
+    }
+  });
+})();
+</script>
 </body>
 
 </html>
+
 
